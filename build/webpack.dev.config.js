@@ -47,7 +47,8 @@ const devWebpackConfig = merge(baseConfig, {
       chunksSortMode: 'dependency'
     }),
     new webpack.HotModuleReplacementPlugin(), //HMR
-    new webpack.NamedModulesPlugin() // HMR
+    // new webpack.NamedModulesPlugin() // HMR 废除了
+    new webpack.optimize.namedModules()
   ]
 })
 

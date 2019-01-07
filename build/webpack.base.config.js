@@ -107,16 +107,31 @@ module.exports = {
     ]
   },
   optimization: { //webpack4.x的最新优化配置项，用于提取公共代码
+    minimize: process.env.NODE_ENV === 'production' ? true : false,
     splitChunks: {
       cacheGroups: {
-        commons: {
-          chunks: 'initial', // all, async
-          name: 'common',
+        default: {
           minChunks: 2,
-          maxInitialRequests: 5, // The default limit is too small to showcase the effect
-          minSize: 0, // This is example is too small to create commons chunks
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+        commons: {
+          chunks: 'initial', // initial初始化模块,all全部模块, async按需加载模块
+          // name: 'common', 
+          minChunks: 2, // 当被引用>=2次进行分割
+          maxInitialRequests: 5, // 异步加载chunk的并发请求数量<=5
+          minSize: 0, // 模块超过0kb自动分离为公共模块
           reuseExistingChunk: true // 可设置是否重用该chunk（查看源码没有发现默认值）
-        }
+        },
+        // antd: { // 单独拆包
+        //     name: "chunk-antd", // 单独将 elementUI 拆包
+        //     priority: 15, // 权重需大于其它缓存组
+        //     test: /[\/]node_modules[\/]antd[\/]/
+        // },
+        // vendors: { // 已经dll部分处理了
+        //     test: /[\\/]node_modules[\\/]/, // 表示默认拆分node_modules中的模块
+        //     priority: -10
+        // }
       }
     }
   },
@@ -128,30 +143,6 @@ module.exports = {
       threadPool: happyThreadPool,
       verbose: true
     }),
-    //webpack4.x的最新优化配置项，用于提取公共代码
-    // new webpack.optimize.SplitChunksPlugin({
-		// 	cacheGroups: {
-		// 		default: {
-		// 			minChunks: 2,
-		// 			priority: -20,
-		// 			reuseExistingChunk: true,
-		// 		},
-		// 		//打包重复出现的代码
-		// 		vendor: {
-		// 			chunks: 'initial',
-		// 			minChunks: 2,
-		// 			maxInitialRequests: 5, // The default limit is too small to showcase the effect
-		// 			minSize: 0, // This is example is too small to create commons chunks
-		// 			name: 'vendor'
-		// 		},
-		// 		//打包第三方类库
-		// 		common: {
-		// 			name: "common",
-		// 			chunks: "initial",
-		// 			minChunks: Infinity
-		// 		}
-		// 	}
-		// }),
     /*加载吧css文件单独分离出来的插件*/
     new MiniCssExtractPlugin({
       filename: '[name].css',
